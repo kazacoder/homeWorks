@@ -12,7 +12,7 @@
     <div class="logo"><img src="images/logo.svg" alt="Logo"></div>
 </header>
 <div class="container">
-    <div class="sign-in-up">
+    <div class="main-sign-in-up">
         <div class="main-title">
             <h1>Get your free account</h1>
         </div>
@@ -21,7 +21,7 @@
         </div>
         <div class="main-form">
             <form action="" class="form">
-                <label>
+                <label class="register">
                     <span class="input-label">Full Name</span>
                     <input type="text" name="full-name" id="full-name">
                 </label>
@@ -29,7 +29,7 @@
                     <span class="input-label">Your username</span>
                     <input type="text" name="user-name" id="user-name">
                     </label>
-                <label>
+                <label class="register">
                     <span class="input-label">E-mail</span>
                     <input type="text" name="email" id="email">
                     </label>
@@ -37,17 +37,21 @@
                     <span class="input-label">Password</span>
                     <input type="text" name="password" id="password">
                 </label>
-                <label>
+                <label class="register">
                     <span class="input-label">Repeat Password</span>
                     <input type="text" name="confirm-password" id="confirm-password">
                 </label>                
-                <label>
+                <label class="form-checkbox register">
                     <input type="checkbox" name="agree" id="agree">
                     <span class="checkbox-label">Agree to our Terms of Service and Privacy Statement</span>
                 </label>
-                <button>Sign Up</button>
-                <a href="#">Already have an account?</a>
+                <div class="form-actions">
+                    <button class="btn" id="sign-up-in">Sign Up</button>
+                </div>
             </form>
+            <div class="link-existing-user register">
+                <a href="#">Already have an account?</a>
+            </div>
         </div>
     </div>
     <div class="main-image">

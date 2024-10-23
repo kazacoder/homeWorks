@@ -1,10 +1,23 @@
+@font-face {
+    font-family: Nunito;
+    src: url("../fonts/Nunitoregular.woff");
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: Nunito;
+    src: url("../fonts/Nunitobold.woff");
+    font-weight: bold;
+}
+
 * {
     margin: 0;
     padding: 0;
 }
 
 body {
-
+    font-family: Nunito, sans-serif;
+    font-weight: bold;
 }
 
 .right-side {
@@ -32,24 +45,113 @@ body {
 }
 
 .container {
-    width: 1200px;
-    margin: 0 auto;
+    max-width: 1200px;
+    margin: 0 auto 100px auto;
     padding-top: 112px;
     display: grid;
     grid-template-columns: 50% 50%;
     justify-items: center;
 }
 
+.main-sign-in-up {
+    max-width: 452px;
+    margin-right: 10px;
+}
+
+.main-title h1 {
+    font-size: 36px;
+}
+
+.main-text {
+    font-size: 22px;
+    line-height: 27px;
+    color: #636363;
+    margin-top: 19px;
+}
+
+.main-form {
+    margin-top: 73px;
+}
+
 .form {
     display: flex;
     flex-direction: column;
+    gap: 25px;
+    margin-bottom: 50px;
+}
+
+.form-checkbox {
+    margin-top: 10px;
 }
 
 .form .input-label {
-    color: red;
     display: block;
+    font-size: 16px;
+    color: #C6C6C4;
 }
+
+.form .checkbox-label {
+    font-size: 16px;
+    color: #636363;
+    margin-left: 10px;
+}
+
+.form input[type="checkbox"] {
+
+}
+
+.form input[type="text"] {
+    font-family: Nunito, sans-serif;
+    font-size: 20px;
+    color: #323232;
+    font-weight: bold;
+    width: 100%;
+    outline: none;
+    border: none;
+    border-bottom: 1px solid #C6C6C4;
+    line-height: 32px;
+}
+
+.form input[type="text"]:focus {
+    box-shadow: 0 0 10px 1px #C6C6C4;
+}
+
+.form-actions {
+    text-align: center;
+    margin-top: 12px;
+}
+
+.btn {
+    width: 210px;
+    height: 70px;
+    background: #DD3142;
+    border-radius: 40px;
+    border: none;
+    font-size: 20px;
+    font-weight: bold;
+    color: #FFFFFF;
+    cursor: pointer;
+}
+
+.link-existing-user {
+    text-align: center;
+}
+
+.link-existing-user a {
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 16px;
+    color: #636363;
+}
+
 .main-image {
     margin-top: 60px;
 }
 
+.register {
+
+}
+
+.register-hide {
+    display: none;
+}
