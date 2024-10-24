@@ -1,3 +1,4 @@
+// 1. Обработчик события полной загрузки страницы:
 window.onload = function () {
 
     // 2. Запрет ввода цифр в поле fullName
@@ -26,7 +27,6 @@ window.onload = function () {
         }
     }
 
-
     // 5.
     // в объект сохранены необходимые элементы
 
@@ -39,12 +39,15 @@ window.onload = function () {
         'agreeError': document.getElementById("agree-error")
     }
 
+    // сохраняем форму и поп-ап в переменные:
     const form = document.querySelector("form");
     const popUp = document.getElementsByClassName('pop-up-wrap')[0];
+
 
     // функция проверки заполнения формы, принимает параметр - тип формы - регистрация или вход
     // если тип формы регистрация - проверка всех полей
     // иначе проверка только полей user name и password
+    // показывает сообщения об ошибках пользователю и подсвечивает поля с ошибками (вместо алертов)
     // если проверка пройдена функция возвращает строку и именем пользователя, иначе - false
     function checkFormAndReturnUserName (formType) {
         const fullName = form[0]
@@ -99,9 +102,9 @@ window.onload = function () {
         if (!hasError) {
             return userName.value
         } else return false;
-
     }
 
+    // функция - обработчик события нажатия кнопки sign-up
     function formSingUpListener (event) {
         event.preventDefault();
         if (checkFormAndReturnUserName('sign-up')) {
@@ -110,6 +113,7 @@ window.onload = function () {
         }
     }
 
+    // функция - обработчик события нажатия кнопки sign-in
     function formSingInListener (event) {
         event.preventDefault();
         let userName = checkFormAndReturnUserName('sign-in')
@@ -120,16 +124,16 @@ window.onload = function () {
 
     }
 
-    // При нажатии на кнопку “Sign Up”:
+    // При нажатии на кнопку “Sign Up” добавляем обработчик событий:
     form.addEventListener("submit", formSingUpListener);
 
     // Обработка кнопки ОК модального окна
-    document.getElementById('redirect-to-login').addEventListener('click', function (e) {
+    document.getElementById('redirect-to-login').addEventListener('click', function () {
         popUp.style.display = 'none';
         makeSignInPage()
     })
 
-    // Закрытие модального окна по клику вне окна
+    // Закрытие модального окна по клику вне окна. Такое же действие как при нажатии ОК
     popUp.addEventListener('click', function (e) {
         if (e.target === this) {
             popUp.style.display = 'none';
@@ -141,17 +145,22 @@ window.onload = function () {
     // 6. При нажатии на ссылку «Already have an account?»,
     // а также на кнопку «ОК» в поп-апе реализована имитация перехода на страницу логина
 
+    // Функция подготовки страницы-имитации логина
     function makeSignInPage() {
         document.getElementById('sign-up-in').innerText = "Sign In";
         document.querySelectorAll('.register').forEach(function (element) {
             element.classList.add('register-hide');
         })
         document.querySelector('.main-title h1').innerText = "Log in to the system";
+
+        // удаляем прежний обработчик события submit формы
         form.removeEventListener('submit', formSingUpListener)
+        // и добавляем новый
         form.addEventListener('submit', formSingInListener)
 
     }
 
+    // обработчик события onclick ссылки "Already have an account?"
     document.getElementById("existing-user").onclick = function (e) {
         e.preventDefault();
         makeSignInPage()
@@ -159,41 +168,26 @@ window.onload = function () {
 
 
     // Факультатив:)
-    // Показываем пароль по mousedown на иконку глаза. Скрываем - по mouseup/mouseleave
+    // Показываем/скрываем пароль по click на иконку глаза
     let showPass = document.getElementById('show-pass')
     let passwordInput = document.getElementById('password')
     let passwordEye = document.getElementById('pass-eye')
     let passwordSlash = document.getElementById('pass-eye-slash')
 
-    showPass.addEventListener('mousedown', function () {
+    showPass.addEventListener('click', function () {
         togglePassView(passwordInput, passwordEye, passwordSlash, passwordInput.type === 'password');
     })
-    // showPass.addEventListener('mouseup', () => {
-    //     togglePassView(passwordInput, passwordEye, passwordSlash, false);
-    // })
-    // showPass.addEventListener('mouseleave', () => {
-    //     togglePassView(passwordInput, passwordEye, passwordSlash, false);
-    // })
 
-
-    // Показываем подтверждение пароля по mousedown на иконку глаза. Скрываем - по mouseup/mouseleave
+    // Показываем/скрываем подтверждение пароля по click на иконку глаза
     let showConfirmPass = document.getElementById('show-confirm-pass')
     let passwordConfirmInput = document.getElementById('confirm-password')
     let passwordConfirmEye = document.getElementById('confirm-pass-eye')
     let passwordConfirmEyeSlash = document.getElementById('confirm-pass-eye-slash')
 
-    showConfirmPass.addEventListener('mousedown', function () {
-        togglePassView(passwordConfirmInput, passwordConfirmEye, passwordConfirmEyeSlash, true);
+    showConfirmPass.addEventListener('click', function () {
+        togglePassView(passwordConfirmInput, passwordConfirmEye, passwordConfirmEyeSlash, passwordConfirmInput.type === 'password');
 
     })
-    showConfirmPass.addEventListener('mouseup', () => {
-        togglePassView(passwordConfirmInput, passwordConfirmEye, passwordConfirmEyeSlash, false);
-    })
-
-    showConfirmPass.addEventListener('mouseleave', function (e) {
-        togglePassView(passwordConfirmInput, passwordConfirmEye, passwordConfirmEyeSlash, false);
-    })
-
 }
 
 
