@@ -21,13 +21,16 @@ body {
 }
 
 .right-side {
-    background: #F8F8FA;
     width: 50%;
-    position: fixed;
     right: 0;
     top: 0;
-    height: 100vh;
+    height: 100%;
     z-index: -1;
+}
+
+.right-side.main {
+    background: #F8F8FA;
+    position: fixed;
 }
 
 .header {
@@ -56,6 +59,8 @@ body {
 .main-sign-in-up {
     max-width: 452px;
     margin-right: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
 }
 
 .main-title h1 {
@@ -108,7 +113,6 @@ body {
     width: 100%;
     outline: none;
     border: none;
-    /*border-bottom: 1px solid #C6C6C4;*/
     line-height: 32px;
     box-sizing: border-box;
 }
@@ -120,9 +124,14 @@ body {
 
 .form-input {
     display: flex;
+    background: white;
     align-items: baseline;
     border-bottom: 1px solid #C6C6C4;
     box-sizing: border-box;
+}
+
+.form-input.error, .form-checkbox.error {
+    box-shadow: 0 0px 5px 1px #E16262FF;
 }
 
 .form-pass-eye {
@@ -130,12 +139,21 @@ body {
     width: 15px;
 }
 
-#confirm-pass-eye-slash {
+.pass-eye-slash {
     display: none;
 }
 
 .form-pass-eye svg {
     fill: #C6C6C4;
+}
+
+.error-message {
+    color: #DD3142;
+    font-size: 12px;
+}
+
+.error-message.agree {
+    margin-left: 25px;
 }
 
 .form-actions {
@@ -144,15 +162,18 @@ body {
 }
 
 .btn {
-    width: 210px;
-    height: 70px;
     background: #DD3142;
     border-radius: 40px;
     border: none;
-    font-size: 20px;
     font-weight: bold;
     color: #FFFFFF;
     cursor: pointer;
+}
+
+.btn.form-btn {
+    width: 210px;
+    height: 70px;
+    font-size: 20px;
 }
 
 .link-existing-user {
@@ -170,10 +191,48 @@ body {
     margin-top: 60px;
 }
 
-.register {
-
-}
-
 .register-hide {
     display: none;
+}
+
+.pop-up-wrap {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.pop-up {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    max-width: 280px;
+    background: white;
+    gap: 20px;
+    text-align: center;
+    padding: 30px 15px;
+}
+
+.pop-up-text {
+    z-index: 1;
+}
+
+.btn.pop-up-btn {
+    padding: 15px 60px;
+    z-index: 1;
+}
+
+.right-side.pop-up {
+    background: #F8F8FA;
+    position: absolute;
+    z-index: 0;
+    padding: 0;
 }

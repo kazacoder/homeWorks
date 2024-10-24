@@ -1,0 +1,73 @@
+@media screen and (max-width: 1200px){
+    .main-image {
+        width: unset;
+    }
+    .main-image img {
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 767px){
+    .container {
+        display: flex;
+        flex-direction: column;
+        padding-top: 30px;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+    .main-sign-in-up {
+        margin: 0;
+    }
+    .main-image {
+        width: 50%;
+        margin-top: 0;
+    }
+    .main-title h1 {
+        font-size: 24px;
+        text-align: center;
+    }
+    .main-text {
+        font-size: 16px;
+        line-height: 1.2;
+        color: #636363;
+        margin-top: 19px;
+        text-align: center;
+    }
+    .main-form {
+        margin-top: 30px;
+    }
+
+    .form {
+        gap: 15px;
+    }
+
+    .form .input-label, .form .checkbox-label {
+        font-size: 12px;
+    }
+
+    .form-checkbox {
+        /*display: flex;*/
+        flex-direction: column;
+        vertical-align: center;
+    }
+    .form .checkbox-label {
+        display: inline-block;
+        max-width: calc(100% - 30px);
+    }
+
+    .form input[type="text"], .form input[type="password"], .form input[type="email"] {
+        font-size: 16px;
+    }
+
+    .btn.form-btn {
+        width: unset;
+        height: unset;
+        font-size: 16px;
+        padding: 15px 60px;
+    }
+
+    .link-existing-user a {
+        font-size: 14px;
+
+    }
+}
