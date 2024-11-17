@@ -1,3 +1,5 @@
+// project script file
+
 // 1. Обработчик события полной загрузки страницы:
 window.onload = function () {
 
@@ -210,3 +212,4 @@ function showError(errorElem, message, input) {
     errorElem.innerHTML = message;
     input.classList.add('error');
 }
+
