@@ -29,7 +29,7 @@ body {
 }
 
 .right-side.main {
-    background: #F8F8FA;
+    background: #fbfbfb;
     position: fixed;
 }
 
@@ -70,7 +70,7 @@ body {
 .main-text {
     font-size: 22px;
     line-height: 27px;
-    color: #636363;
+    color: #595959;
     margin-top: 19px;
 }
 
@@ -131,7 +131,7 @@ body {
 }
 
 .form-input.error, .form-checkbox.error {
-    box-shadow: 0 0px 5px 1px #E16262FF;
+    box-shadow: 0 0px 5px 1px #c85555;
 }
 
 .form-pass-eye {
@@ -148,7 +148,7 @@ body {
 }
 
 .error-message {
-    color: #DD3142;
+    color: #d32838;
     font-size: 12px;
 }
 
@@ -162,7 +162,7 @@ body {
 }
 
 .btn {
-    background: #DD3142;
+    background: #d32838;
     border-radius: 40px;
     border: none;
     font-weight: bold;
