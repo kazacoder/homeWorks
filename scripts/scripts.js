@@ -214,3 +214,6 @@ function showError(errorElem, message, input) {
 }
 
 //end of file
+
+
+console.log('task 13')
