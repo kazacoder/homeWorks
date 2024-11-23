@@ -1,5 +1,3 @@
-// project script file
-
 // 1. Обработчик события полной загрузки страницы:
 window.onload = function () {
 
