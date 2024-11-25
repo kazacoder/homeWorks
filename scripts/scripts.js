@@ -67,7 +67,7 @@ $(document).ready(function () {
         if (password.value === "") {
             showError(errors.passError, 'Please enter password!', password.parentElement);
             hasError = true;
-        } else if (!passwordRegExp.test(password.value)) {
+        } else if (!passwordRegExp.test(password.value) && formType === 'sign-up') {
             showError(errors.passError, 'Password must be at least 8 characters and contains at least one uppercase letter, lowercase letter, digit, special character', password.parentElement);
             hasError = true;
         } else if (password.value !== confirmPassword.value && formType === 'sign-up') {
@@ -85,10 +85,6 @@ $(document).ready(function () {
         }
         //проверка пройдена
         if (!hasError) {
-            if (formType === 'sign-up') {
-                let data = new FormData(form);
-                localStorage.setItem('users', JSON.stringify(form));
-            }
             return userName.value
         } else return false;
     }
@@ -96,7 +92,21 @@ $(document).ready(function () {
     // функция - обработчик события нажатия кнопки sign-up
     function formSignUpListener(event) {
         event.preventDefault();
-        if (checkFormAndReturnUserName('sign-up')) {
+        let userName = checkFormAndReturnUserName('sign-up')
+        if (userName) {
+            let formObject = {}
+            let users = localStorage.getItem('users');
+            if (users) {
+                formObject = JSON.parse(users);
+            }
+            formObject[userName] = {}
+            const data = new FormData(form);
+            data.forEach((value, key) => {
+                formObject[userName][key] = value;
+            })
+
+            localStorage.setItem('users', JSON.stringify(formObject));
+            console.log(JSON.parse(localStorage.getItem('users')));
             popUp.style.display = 'flex';
             form.reset()
         }
@@ -105,13 +115,21 @@ $(document).ready(function () {
     // функция - обработчик события нажатия кнопки sign-in
     function formSignInListener(event) {
         event.preventDefault();
+        const password = event.target[3]
+        const user = event.target[1]
         let userName = checkFormAndReturnUserName('sign-in')
-        console.log(userName)
-        if (userName) {
-            form.reset()
-            makePersonalAccountPage(userName);
+        let users = JSON.parse(localStorage.getItem('users'));
+        if (users[user.value]) {
+            if (password.value === users[userName]['password']) {
+                form.reset()
+                makePersonalAccountPage(users[userName]['full-name']);
+            } else {
+                showError(errors.passError, 'Wrong password!', password.parentElement)
+                console.log('wrong password!');
+            }
+        } else {
+            showError(errors.userNameError, 'Such user does not exist!', user.parentElement)
         }
-
     }
 
     // Добавляем обработчик события submit для формы:
@@ -148,7 +166,7 @@ $(document).ready(function () {
 
     }
 
-    // Функция подготовки страницы-имитации лмчного кабинета
+    // Функция подготовки страницы-имитации личного кабинета
     function makePersonalAccountPage(name) {
         $('#sign-up-in').text(`Exit`);
         $('.form-input').addClass('register-hide');
