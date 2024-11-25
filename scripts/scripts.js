@@ -1,31 +1,4 @@
-// 1. Обработчик события полной загрузки страницы:
-window.onload = function () {
-
-    // 2. Запрет ввода цифр в поле fullName
-    let fullName = document.getElementById("full-name");
-    fullName.onkeydown = function (e) {
-        if (/\d/.test(e.key)) {
-            return false;
-        }
-    }
-
-    // 3. Запрет ввода точки и запятой в поле userName
-    let userName = document.getElementById("user-name");
-    userName.onkeydown = function (e) {
-        if (/[.,]/.test(e.key)) {
-            return false;
-        }
-    }
-
-    // 4. При изменении значения чекбокса вывод в консоль соответствующее сообщение: “Согласен” или “Не согласен”.
-    let agree = document.getElementById("agree");
-    agree.onchange = function (e) {
-        if (e.target.checked) {
-            console.log('Согласен');
-        } else {
-            console.log('Не согласен');
-        }
-    }
+$(document).ready(function () {
 
     // 5.
     // в объект сохранены необходимые элементы
@@ -40,7 +13,7 @@ window.onload = function () {
     }
 
     // сохраняем форму и поп-ап в переменные:
-    const form = document.querySelector("form");
+    const form = $("form")[0];
     const popUp = document.getElementsByClassName('pop-up-wrap')[0];
 
 
@@ -49,7 +22,7 @@ window.onload = function () {
     // иначе проверка только полей user name и password
     // показывает сообщения об ошибках пользователю и подсвечивает поля с ошибками (вместо алертов)
     // если проверка пройдена функция возвращает строку и именем пользователя, иначе - false
-    function checkFormAndReturnUserName (formType) {
+    function checkFormAndReturnUserName(formType) {
         const fullName = form[0]
         const userName = form[1]
         const email = form[2]
@@ -58,10 +31,13 @@ window.onload = function () {
         const agree = form[5]
         let hasError = false;
 
+        const fullNameRegExp = /^[a-zа-яё ]+$/gi
+        const userNameRegExp = /^[a-zа-яё \-_\d]+$/gi
+        const emailRegExp = /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/gm
+        const passwordRegExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$@!%&*?])[A-Za-z\d#$@!%&*?]{8,}$/
+
         //очистка ошибок
-        document.querySelectorAll('input').forEach(input => {
-            input.parentElement.classList.remove('error')
-        })
+        $('.form-input').removeClass('error')
         for (let error in errors) {
             errors[error].innerText = ''
         }
@@ -70,20 +46,29 @@ window.onload = function () {
         if (fullName.value === "" && formType === 'sign-up') {
             showError(errors.fullNameError, 'Please enter Your full name!', fullName.parentElement);
             hasError = true;
+        } else if (!fullNameRegExp.test(fullName.value) && formType === 'sign-up') {
+            showError(errors.fullNameError, 'This field may contains letters and space only', fullName.parentElement);
+            hasError = true;
         }
         if (userName.value === "") {
             showError(errors.userNameError, 'Please enter Your user name!', userName.parentElement);
+            hasError = true;
+        } else if (!userNameRegExp.test(userName.value)) {
+            showError(errors.userNameError, 'This field may contains letters, digits, space and signs "-_" only', userName.parentElement);
             hasError = true;
         }
         if (email.value === "" && formType === 'sign-up') {
             showError(errors.emailError, 'Please enter Your email address!', email.parentElement);
             hasError = true;
+        } else if (!emailRegExp.test(email.value) && formType === 'sign-up') {
+            showError(errors.emailError, 'You must enter a valid email in this field', email.parentElement);
+            hasError = true;
         }
         if (password.value === "") {
             showError(errors.passError, 'Please enter password!', password.parentElement);
             hasError = true;
-        } else if (password.value.length < 8) {
-            showError(errors.passError, 'Password must be at least 8 characters!', password.parentElement);
+        } else if (!passwordRegExp.test(password.value)) {
+            showError(errors.passError, 'Password must be at least 8 characters and contains at least one uppercase letter, lowercase letter, digit, special character', password.parentElement);
             hasError = true;
         } else if (password.value !== confirmPassword.value && formType === 'sign-up') {
             showError(errors.passError, 'Password and confirmation do not match!', password.parentElement);
@@ -100,12 +85,16 @@ window.onload = function () {
         }
         //проверка пройдена
         if (!hasError) {
+            if (formType === 'sign-up') {
+                let data = new FormData(form);
+                localStorage.setItem('users', JSON.stringify(form));
+            }
             return userName.value
         } else return false;
     }
 
     // функция - обработчик события нажатия кнопки sign-up
-    function formSingUpListener (event) {
+    function formSignUpListener(event) {
         event.preventDefault();
         if (checkFormAndReturnUserName('sign-up')) {
             popUp.style.display = 'flex';
@@ -114,21 +103,22 @@ window.onload = function () {
     }
 
     // функция - обработчик события нажатия кнопки sign-in
-    function formSingInListener (event) {
+    function formSignInListener(event) {
         event.preventDefault();
         let userName = checkFormAndReturnUserName('sign-in')
+        console.log(userName)
         if (userName) {
             form.reset()
-            alert(`Добро пожаловать, ${userName}!`)
+            makePersonalAccountPage(userName);
         }
 
     }
 
-    // При нажатии на кнопку “Sign Up” добавляем обработчик событий:
-    form.addEventListener("submit", formSingUpListener);
+    // Добавляем обработчик события submit для формы:
+    form.addEventListener("submit", formSignUpListener);
 
     // Обработка кнопки ОК модального окна
-    document.getElementById('redirect-to-login').addEventListener('click', function () {
+    $('#redirect-to-login').on('click', function () {
         popUp.style.display = 'none';
         makeSignInPage()
     })
@@ -147,24 +137,35 @@ window.onload = function () {
 
     // Функция подготовки страницы-имитации логина
     function makeSignInPage() {
-        document.getElementById('sign-up-in').innerText = "Sign In";
-        document.querySelectorAll('.register').forEach(function (element) {
-            element.classList.add('register-hide');
-        })
-        document.querySelector('.main-title h1').innerText = "Log in to the system";
+        $('#sign-up-in').text("Sign In");
+        $('.register').addClass('register-hide');
+        $('.main-title h1').text("Log in to the system");
 
         // удаляем прежний обработчик события submit формы
-        form.removeEventListener('submit', formSingUpListener)
+        form.removeEventListener('submit', formSignUpListener)
         // и добавляем новый
-        form.addEventListener('submit', formSingInListener)
+        form.addEventListener('submit', formSignInListener)
+
+    }
+
+    // Функция подготовки страницы-имитации лмчного кабинета
+    function makePersonalAccountPage(name) {
+        $('#sign-up-in').text(`Exit`);
+        $('.form-input').addClass('register-hide');
+        $('.main-text').addClass('register-hide');
+        $('label').addClass('register-hide');
+        $('.main-title h1').text(`Welcome, ${name}!`);
+
+        // удаляем прежний обработчик события submit формы
+        form.removeEventListener('submit', formSignInListener)
 
     }
 
     // обработчик события onclick ссылки "Already have an account?"
-    document.getElementById("existing-user").onclick = function (e) {
+    $("#existing-user").on('click', function (e) {
         e.preventDefault();
         makeSignInPage()
-    };
+    });
 
 
     // Факультатив:)
@@ -188,7 +189,8 @@ window.onload = function () {
         togglePassView(passwordConfirmInput, passwordConfirmEye, passwordConfirmEyeSlash, passwordConfirmInput.type === 'password');
 
     })
-}
+
+})
 
 
 // функция - переключатель типа инпута text\password и значка - глаза - отображения пароля
