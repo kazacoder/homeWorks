@@ -1,7 +1,6 @@
 $(document).ready(function () {
 
-    // 5.
-    // в объект сохранены необходимые элементы
+    // в объект сохраняем HTML элементы для записи в них ошибок заполнения формы
 
     const errors = {
         'fullNameError': document.getElementById("full-name-error"),
@@ -12,35 +11,57 @@ $(document).ready(function () {
         'agreeError': document.getElementById("agree-error")
     }
 
-    // сохраняем форму и поп-ап в переменные:
+    // сохраняем форму переменную:
     const form = $("form")[0];
+    // сохраняем инпуты в переменные
+    const fullName = form[0]
+    const userName = form[1]
+    const email = form[2]
+    const password = form[3]
+    const confirmPassword = form[4]
+    const agree = form[5]
+
+    // сохраняем поп-ап в переменную:
     const popUp = document.getElementsByClassName('pop-up-wrap')[0];
+
+    // объявляем переменную для сохранения регистрационных данных пользователя
+    let userObject = {}
+
+
+    // функция очистки ошибок
+    function cleanUpErrors() {
+        $('.form-input').removeClass('error')
+        $('.form-checkbox').removeClass('error')
+        for (let error in errors) {
+            errors[error].innerText = ''
+        }
+    }
 
 
     // функция проверки заполнения формы, принимает параметр - тип формы - регистрация или вход
     // если тип формы регистрация - проверка всех полей
     // иначе проверка только полей user name и password
-    // показывает сообщения об ошибках пользователю и подсвечивает поля с ошибками (вместо алертов)
+    // показывает сообщения об ошибках пользователю и подсвечивает поля с ошибками
     // если проверка пройдена функция возвращает строку и именем пользователя, иначе - false
     function checkFormAndReturnUserName(formType) {
-        const fullName = form[0]
-        const userName = form[1]
-        const email = form[2]
-        const password = form[3]
-        const confirmPassword = form[4]
-        const agree = form[5]
+
+        // объявляем флаг ошибок в форме
         let hasError = false;
 
+        //
+        let users = localStorage.getItem('users');
+        if (users) {
+            userObject = JSON.parse(users);
+        }
+
+        // сохраняем RegExp шаблоны в переменные
         const fullNameRegExp = /^[a-zа-яё ]+$/gi
         const userNameRegExp = /^[a-zа-яё \-_\d]+$/gi
         const emailRegExp = /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/gm
-        const passwordRegExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$@!%&*?])[A-Za-z\d#$@!%&*?]{8,}$/
+        const passwordRegExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$@!%&*?'";:/\\{}\[\]^_\-,.=<>+])[A-Za-z\d#$@!%&*?'";:/\\{}\[\]^_\-,.=<>+]{8,}$/
 
         //очистка ошибок
-        $('.form-input').removeClass('error')
-        for (let error in errors) {
-            errors[error].innerText = ''
-        }
+        cleanUpErrors()
 
         // проверка полей на ошибки
         if (fullName.value === "" && formType === 'sign-up') {
@@ -56,6 +77,8 @@ $(document).ready(function () {
         } else if (!userNameRegExp.test(userName.value)) {
             showError(errors.userNameError, 'This field may contains letters, digits, space and signs "-_" only', userName.parentElement);
             hasError = true;
+        } else if (userObject[userName.value] && formType === 'sign-up') {
+            showError(errors.userNameError, 'Such user is already exist, please choose another Username!', userName.parentElement)
         }
         if (email.value === "" && formType === 'sign-up') {
             showError(errors.emailError, 'Please enter Your email address!', email.parentElement);
@@ -71,8 +94,8 @@ $(document).ready(function () {
             showError(errors.passError, 'Password must be at least 8 characters and contains at least one uppercase letter, lowercase letter, digit, special character', password.parentElement);
             hasError = true;
         } else if (password.value !== confirmPassword.value && formType === 'sign-up') {
-            showError(errors.passError, 'Password and confirmation do not match!', password.parentElement);
-            showError(errors.confirmPassError, 'Password and confirmation do not match!', confirmPassword.parentElement);
+            showError(errors.passError, 'Password and confirmation does not match!', password.parentElement);
+            showError(errors.confirmPassError, 'Password and confirmation does not match!', confirmPassword.parentElement);
             hasError = true;
         }
         if (confirmPassword.value === "" && formType === 'sign-up') {
@@ -83,7 +106,8 @@ $(document).ready(function () {
             showError(errors.agreeError, 'You have to agree to our Terms of Service and Privacy Statement!', agree.parentElement);
             hasError = true;
         }
-        //проверка пройдена
+
+        //проверка состояния флага hasError
         if (!hasError) {
             return userName.value
         } else return false;
@@ -94,19 +118,13 @@ $(document).ready(function () {
         event.preventDefault();
         let userName = checkFormAndReturnUserName('sign-up')
         if (userName) {
-            let formObject = {}
-            let users = localStorage.getItem('users');
-            if (users) {
-                formObject = JSON.parse(users);
-            }
-            formObject[userName] = {}
+            userObject[userName] = {}
             const data = new FormData(form);
             data.forEach((value, key) => {
-                formObject[userName][key] = value;
+                userObject[userName][key] = value;
             })
 
-            localStorage.setItem('users', JSON.stringify(formObject));
-            console.log(JSON.parse(localStorage.getItem('users')));
+            localStorage.setItem('users', JSON.stringify(userObject));
             popUp.style.display = 'flex';
             form.reset()
         }
@@ -115,19 +133,18 @@ $(document).ready(function () {
     // функция - обработчик события нажатия кнопки sign-in
     function formSignInListener(event) {
         event.preventDefault();
-        const password = event.target[3]
-        const user = event.target[1]
-        let userName = checkFormAndReturnUserName('sign-in')
+        let currentUserName = checkFormAndReturnUserName('sign-in')
         let users = JSON.parse(localStorage.getItem('users'));
-        if (users && users[user.value]) {
-            if (password.value === users[userName]['password']) {
+        if (users && users[userName.value]) {
+            if (password.value === users[userName.value]['password']) {
                 form.reset()
-                makePersonalAccountPage(users[userName]['full-name']);
-            } else {
+                makePersonalAccountPage(users[currentUserName]['full-name']);
+                $('.header')[0].scrollIntoView({behavior: 'smooth'});
+            } else if (password.value) {
                 showError(errors.passError, 'Wrong password!', password.parentElement)
             }
-        } else if (user.value) {
-            showError(errors.userNameError, 'Such user does not exist!', user.parentElement)
+        } else if (userName.value) {
+            showError(errors.userNameError, 'Such user does not exist!', userName.parentElement)
         }
     }
 
@@ -149,7 +166,14 @@ $(document).ready(function () {
     })
 
 
-    // 6. При нажатии на ссылку «Already have an account?»,
+    // обработчик события onclick ссылки "Already have an account?"
+    let existedUser = $("#existing-user");
+    existedUser.on('click', function (e) {
+        e.preventDefault();
+        makeSignInPage()
+    });
+
+    // При нажатии на ссылку «Already have an account?»,
     // а также на кнопку «ОК» в поп-апе реализована имитация перехода на страницу логина
 
     // Функция подготовки страницы-имитации логина
@@ -163,47 +187,43 @@ $(document).ready(function () {
         // и добавляем новый
         form.addEventListener('submit', formSignInListener)
 
+        // меняем текст и обработчик событий ссылки "Already have an account?"
+        existedUser.text('Registration').on('click', () => {location.reload()})
+
+        // предварительно очищаем ошибки
+        cleanUpErrors()
     }
 
     // Функция подготовки страницы-имитации личного кабинета
     function makePersonalAccountPage(name) {
         $('#sign-up-in').text(`Exit`);
-        $('.form-input').addClass('register-hide');
-        $('.main-text').addClass('register-hide');
-        $('label').addClass('register-hide');
+        $('.login').addClass('register-hide');
         $('.main-title h1').text(`Welcome, ${name}!`);
 
         // удаляем прежний обработчик события submit формы
         form.removeEventListener('submit', formSignInListener)
-
     }
-
-    // обработчик события onclick ссылки "Already have an account?"
-    $("#existing-user").on('click', function (e) {
-        e.preventDefault();
-        makeSignInPage()
-    });
 
 
     // Показываем/скрываем пароль по click на иконку глаза
-    let showPass = document.getElementById('show-pass')
-    let passwordInput = document.getElementById('password')
+    let showPass = $('#show-pass')
+    let passwordInput = $('#password')
     let passwordEye = document.getElementById('pass-eye')
     let passwordSlash = document.getElementById('pass-eye-slash')
 
-    showPass.addEventListener('click', function () {
-        togglePassView(passwordInput, passwordEye, passwordSlash, passwordInput.type === 'password');
+    showPass.on('click', function (e) {
+        togglePassView(passwordInput, passwordEye, passwordSlash, passwordInput.is('input:password'));
     })
 
+
     // Показываем/скрываем подтверждение пароля по click на иконку глаза
-    let showConfirmPass = document.getElementById('show-confirm-pass')
-    let passwordConfirmInput = document.getElementById('confirm-password')
+    let showConfirmPass = $('#show-confirm-pass')
+    let passwordConfirmInput = $('#confirm-password')
     let passwordConfirmEye = document.getElementById('confirm-pass-eye')
     let passwordConfirmEyeSlash = document.getElementById('confirm-pass-eye-slash')
 
-    showConfirmPass.addEventListener('click', function () {
-        togglePassView(passwordConfirmInput, passwordConfirmEye, passwordConfirmEyeSlash, passwordConfirmInput.type === 'password');
-
+    showConfirmPass.on('click', function () {
+        togglePassView(passwordConfirmInput, passwordConfirmEye, passwordConfirmEyeSlash, passwordConfirmInput.is('input:password'));
     })
 
 })
@@ -212,11 +232,11 @@ $(document).ready(function () {
 // функция - переключатель типа инпута text\password и значка - глаза - отображения пароля
 function togglePassView(input, eye, eyeSlash, show) {
     if (show) {
-        input.type = 'text'
+        input[0].type = 'text'
         eye.style.display = 'none';
         eyeSlash.style.display = 'block';
     } else {
-        input.type = 'password'
+        input[0].type = 'password'
         eye.style.display = 'block';
         eyeSlash.style.display = 'none';
     }
