@@ -119,15 +119,14 @@ $(document).ready(function () {
         const user = event.target[1]
         let userName = checkFormAndReturnUserName('sign-in')
         let users = JSON.parse(localStorage.getItem('users'));
-        if (users[user.value]) {
+        if (users && users[user.value]) {
             if (password.value === users[userName]['password']) {
                 form.reset()
                 makePersonalAccountPage(users[userName]['full-name']);
             } else {
                 showError(errors.passError, 'Wrong password!', password.parentElement)
-                console.log('wrong password!');
             }
-        } else {
+        } else if (user.value) {
             showError(errors.userNameError, 'Such user does not exist!', user.parentElement)
         }
     }
@@ -186,7 +185,6 @@ $(document).ready(function () {
     });
 
 
-    // Факультатив:)
     // Показываем/скрываем пароль по click на иконку глаза
     let showPass = document.getElementById('show-pass')
     let passwordInput = document.getElementById('password')
