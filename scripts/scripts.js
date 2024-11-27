@@ -38,6 +38,65 @@ $(document).ready(function () {
     }
 
 
+    // функции обработчики событий / проверки полей
+
+    function inputErrorCheckerTextInput (input, formType, errorElem, inputName, regExpErrMessage, regExp,
+                                         existingUser=null, existingUserErrMsg=null, alwaysCheck=false) {
+        if (input.value === "" && (formType === 'sign-up' || alwaysCheck)) {
+            showError(errors[errorElem], `Please enter Your ${inputName}!`, input.parentElement);
+            return true;
+        } else if (!regExp.test(input.value) && formType === 'sign-up') {
+            showError(errors[errorElem], regExpErrMessage, input.parentElement);
+            return true;
+        } else if (existingUser && existingUser[input.value] && formType === 'sign-up') {
+            showError(errors[errorElem], existingUserErrMsg, input.parentElement);
+            return true;
+        } else {
+            hideError(errors[errorElem], input.parentElement)
+            return false;
+        }
+    }
+
+    function inputErrorCheckerPassword (passwordInput, confirmInput, formType, errorPassElem, errorConfirmElem, passRegExp) {
+        let hasError = false;
+
+        if (password.value === "") {
+            showError(errors[errorPassElem], 'Please enter password!', password.parentElement);
+            hasError = true;
+        } else if (!passRegExp.test(password.value) && formType === 'sign-up') {
+            showError(errors[errorPassElem], 'Password must be at least 8 characters and contains at least one uppercase letter, lowercase letter, digit, special character', password.parentElement);
+            hasError = true;
+        } else if (password.value !== confirmPassword.value && formType === 'sign-up') {
+            showError(errors[errorPassElem], 'Password and confirmation does not match!', password.parentElement);
+            hasError = true;
+        } else {
+            hideError(errors[errorPassElem], passwordInput.parentElement)
+        }
+
+        if (confirmInput.value === "" && formType === 'sign-up') {
+            showError(errors[errorConfirmElem], 'Please confirm your password!', confirmInput.parentElement);
+            hasError = true;
+        } else if (password.value !== confirmPassword.value && formType === 'sign-up') {
+            showError(errors[errorConfirmElem], 'Password and confirmation does not match!', confirmPassword.parentElement);
+            hasError = true;
+        } else {
+            hideError(errors[errorConfirmElem], confirmInput.parentElement)
+        }
+
+        return hasError
+    }
+
+    function inputErrorCheckerCheckBox (input, formType, errorElem, message) {
+        if (!input.checked && formType === 'sign-up') {
+            showError(errors[errorElem], message, input.parentElement);
+            return true;
+        } else {
+            hideError(errors[errorElem], input.parentElement)
+            return false;
+        }
+    }
+
+
     // функция проверки заполнения формы, принимает параметр - тип формы - регистрация или вход
     // если тип формы регистрация - проверка всех полей
     // иначе проверка только полей user name и password
@@ -45,69 +104,57 @@ $(document).ready(function () {
     // если проверка пройдена функция возвращает строку и именем пользователя, иначе - false
     function checkFormAndReturnUserName(formType) {
 
-        // объявляем флаг ошибок в форме
-        let hasError = false;
-
-        //
+        // сохраняем существующих пользователей из localStorage
         let users = localStorage.getItem('users');
         if (users) {
             userObject = JSON.parse(users);
         }
 
         // сохраняем RegExp шаблоны в переменные
-        const fullNameRegExp = /^[a-zа-яё ]+$/gi
-        const userNameRegExp = /^[a-zа-яё \-_\d]+$/gi
-        const emailRegExp = /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/gm
+        const fullNameRegExp = /^[a-zа-яё ]+$/i
+        const userNameRegExp = /^[a-zа-яё \-_\d]+$/i
+        const emailRegExp = /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/m
         const passwordRegExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$@!%&*?'";:/\\{}\[\]^_\-,.=<>+])[A-Za-z\d#$@!%&*?'";:/\\{}\[\]^_\-,.=<>+]{8,}$/
 
         //очистка ошибок
         cleanUpErrors()
 
         // проверка полей на ошибки
-        if (fullName.value === "" && formType === 'sign-up') {
-            showError(errors.fullNameError, 'Please enter Your full name!', fullName.parentElement);
-            hasError = true;
-        } else if (!fullNameRegExp.test(fullName.value) && formType === 'sign-up') {
-            showError(errors.fullNameError, 'This field may contains letters and space only', fullName.parentElement);
-            hasError = true;
-        }
-        if (userName.value === "") {
-            showError(errors.userNameError, 'Please enter Your user name!', userName.parentElement);
-            hasError = true;
-        } else if (!userNameRegExp.test(userName.value)) {
-            showError(errors.userNameError, 'This field may contains letters, digits, space and signs "-_" only', userName.parentElement);
-            hasError = true;
-        } else if (userObject[userName.value] && formType === 'sign-up') {
-            showError(errors.userNameError, 'Such user is already exist, please choose another Username!', userName.parentElement)
-        }
-        if (email.value === "" && formType === 'sign-up') {
-            showError(errors.emailError, 'Please enter Your email address!', email.parentElement);
-            hasError = true;
-        } else if (!emailRegExp.test(email.value) && formType === 'sign-up') {
-            showError(errors.emailError, 'You must enter a valid email in this field', email.parentElement);
-            hasError = true;
-        }
-        if (password.value === "") {
-            showError(errors.passError, 'Please enter password!', password.parentElement);
-            hasError = true;
-        } else if (!passwordRegExp.test(password.value) && formType === 'sign-up') {
-            showError(errors.passError, 'Password must be at least 8 characters and contains at least one uppercase letter, lowercase letter, digit, special character', password.parentElement);
-            hasError = true;
-        } else if (password.value !== confirmPassword.value && formType === 'sign-up') {
-            showError(errors.passError, 'Password and confirmation does not match!', password.parentElement);
-            showError(errors.confirmPassError, 'Password and confirmation does not match!', confirmPassword.parentElement);
-            hasError = true;
-        }
-        if (confirmPassword.value === "" && formType === 'sign-up') {
-            showError(errors.confirmPassError, 'Please confirm your password!', confirmPassword.parentElement);
-            hasError = true;
-        }
-        if (!agree.checked && formType === 'sign-up') {
-            showError(errors.agreeError, 'You have to agree to our Terms of Service and Privacy Statement!', agree.parentElement);
-            hasError = true;
-        }
+
+        let nameError = inputErrorCheckerTextInput(fullName, formType, 'fullNameError',
+            'full name', 'This field may contains letters and space only', fullNameRegExp)
+
+        $(fullName).on('input', inputErrorCheckerTextInput.bind(null, fullName, formType, 'fullNameError',
+            'full name', 'This field may contains letters and space only', fullNameRegExp));
+
+        let userError = inputErrorCheckerTextInput(userName, formType, 'userNameError',
+            'user name', 'This field may contains letters, digits, space and signs "-_" only', userNameRegExp,
+            userObject, 'Such user is already exist, please choose another Username!', true)
+
+        $(userName).on('input', inputErrorCheckerTextInput.bind(null, userName, formType, 'userNameError',
+            'user name', 'This field may contains letters, digits, space and signs "-_" only', userNameRegExp,
+            userObject, 'Such user is already exist, please choose another Username!', true));
+
+        let emailError = inputErrorCheckerTextInput(email, formType, 'emailError',
+            'email address', 'You must enter a valid email in this field', emailRegExp)
+
+        $(email).on('input', inputErrorCheckerTextInput.bind(null, email, formType, 'emailError',
+            'email address', 'You must enter a valid email in this field', emailRegExp));
+
+        let passError = inputErrorCheckerPassword(password, confirmPassword, formType,'passError',
+            'confirmPassError', passwordRegExp)
+        $([password, confirmPassword]).on('input', inputErrorCheckerPassword.bind(this, password, confirmPassword, formType,
+            'passError', 'confirmPassError', passwordRegExp));
+
+        let agreeError = inputErrorCheckerCheckBox(agree, formType, 'agreeError',
+            'You have to agree to our Terms of Service and Privacy Statement!');
+        $(agree).on('change', inputErrorCheckerCheckBox.bind(this, agree, formType, 'agreeError',
+            'You have to agree to our Terms of Service and Privacy Statement!'))
+
 
         //проверка состояния флага hasError
+        let hasError = [nameError, userError, emailError, passError, agreeError].some((el) => el)
+
         if (!hasError) {
             return userName.value
         } else return false;
@@ -247,5 +294,10 @@ function togglePassView(input, eye, eyeSlash, show) {
 function showError(errorElem, message, input) {
     errorElem.innerHTML = message;
     input.classList.add('error');
+}
+
+function hideError(errorElem, input) {
+    errorElem.innerHTML = '';
+    input.classList.remove('error');
 }
 
